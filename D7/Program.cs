@@ -35,19 +35,15 @@ for (var i = 1; i < lines.Count; i++)
                     throw new Exception("oops");
                 }
             }
-
             break;
         }
     }
 }
 
-Console.Write("Processing done");
-// Console.WriteLine("/\n" + rootDir.GetTree(1));
-var totalUsedSpace = rootDir.Size;
-Console.WriteLine("Total size: " + totalUsedSpace);
 var part1 = 0;
 GetSums(rootDir);
 Console.WriteLine("Sum of dirs with size up to 100000: " + part1);
+
 var spaceToFreeUp = 30000000 - (70000000 - rootDir.Size);
 var dirToDelete = rootDir;
 GetDirToDelete(rootDir);
@@ -66,7 +62,6 @@ void GetDirToDelete(Directory directory)
     }
 }
 
-
 void GetSums(Directory dir)
 {
     if (dir.Size <= 100000)
@@ -81,72 +76,29 @@ void GetSums(Directory dir)
 
 void ChangeDirectory(string targetDirectory)
 {
-    if (targetDirectory == "/")
+    switch (targetDirectory)
     {
-        return;
+        case "/":
+            return;
+        case "..":
+            tree.Pop();
+            return;
+        default:
+            var currentDir = tree.Peek();
+            var nextDir = currentDir.Directories.FirstOrDefault(d => d.Name == targetDirectory) ?? 
+                          new Directory { Name = targetDirectory };
+            tree.Push(nextDir);
+            currentDir.Directories.Add(nextDir);
+            break;
     }
-    
-    if (targetDirectory == "..")
-    {
-        tree.Pop();
-        return;
-    }
-
-    var currentDir = tree.Peek();
-    var nextDir = currentDir.Directories.FirstOrDefault(d => d.Name == targetDirectory) ?? 
-                  new Directory { Name = targetDirectory };
-    tree.Push(nextDir);
-    currentDir.Directories.Add(nextDir);
 }
 
-class Directory
+internal class Directory
 {
     public string Name { get; init; } = "";
-
     public List<Directory> Directories { get; } = new ();
-
     public List<MyFile> Files { get; } = new ();
-
-    public int Size
-    {
-        get
-        {
-            var filesSum = Files.Sum(f => f.Size);
-            var dirSum = Directories.Sum(d => d.Size);
-            var total = filesSum + dirSum;
-            return total;
-        }
-    }
-
-    public string GetTree(int depth)
-    {
-        var spaces = "";
-        for (var i = 0; i < depth; i++)
-        {
-            spaces += "  ";
-        }
-
-        var myTree = "";
-        // myTree = "\n" + spaces +  "- " + Name;
-        
-        foreach (var myFile in Files)
-        {
-            myTree += $"\n{spaces}- {myFile.Name} {myFile.Size} (file)";
-        }
-
-        foreach (var directory in Directories)
-        {
-            myTree += $"\n{spaces}- {directory.Name} (dir)";
-            myTree += directory.GetTree(depth+1);
-        }
-
-        return myTree;
-    }
+    public int Size => Files.Sum(f => f.Size) + Directories.Sum(d => d.Size);
 }
 
-class MyFile
-{
-    public string Name { get; init; } = "";
-
-    public int Size { get; init; }
-}
+internal record MyFile(string Name = "", int Size = 0);

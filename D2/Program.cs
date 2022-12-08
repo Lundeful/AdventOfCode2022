@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-var myScore = 0;
+﻿var myScore = 0;
 var opponentScore = 0;
 
 // A = ROCK
@@ -13,35 +11,17 @@ static (int p1Score, int p2Score) GetRoundScore(string p1Hand, string p2Hand)
     {
         return (3, 3);
     }
-    if (p1Hand == "A" && p2Hand == "B")
-    {
-        return (0, 6);
-    }
-    if (p1Hand == "A" && p2Hand == "C")
-    {
-        return (6, 0);
-    }
-        
-    if (p1Hand == "B" && p2Hand == "A")
-    {
-        return (6, 0);
-    }
-    if (p1Hand == "B" && p2Hand == "C")
-    {
-        return (0, 6);
-    }
 
-    if (p1Hand == "C" && p2Hand == "A")
+    return p1Hand switch
     {
-        return (0, 6);
-    }
-        
-    if (p1Hand == "C" && p2Hand == "B")
-    {
-        return (6, 0);
-    }
-
-    throw new Exception("Input not allowed");
+        "A" when p2Hand == "B" => (0, 6),
+        "A" when p2Hand == "C" => (6, 0),
+        "B" when p2Hand == "A" => (6, 0),
+        "B" when p2Hand == "C" => (0, 6),
+        "C" when p2Hand == "A" => (0, 6),
+        "C" when p2Hand == "B" => (6, 0),
+        _ => throw new Exception("Input not allowed")
+    };
 }
 
 static int GetScoreFromHand(string hand) =>

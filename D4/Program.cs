@@ -1,27 +1,19 @@
-﻿using Range = D4.Range;
-
-var lines = File.ReadLines("./input.txt")
+﻿var lines = File.ReadLines("./input.txt")
     .Select(l => l.Replace("-", ".."));
 
-// Create a list to hold the tuples
-var tuples = new List<Tuple<Range, Range>>();
+var tuples = new List<Tuple<Tuple<int, int>, Tuple<int, int>>>();
 
-// Loop through each line
 foreach (var line in lines)
 {
-    // Split the line into two parts, separated by a comma
     var parts = line.Split(',');
 
-    // Try to parse the first part into a range
-    if (Range.TryParse(parts[0], out var first))
-    {
-        // If the parse was successful, try to parse the second part
-        if (Range.TryParse(parts[1], out var second))
-        {
-            // If the parse was successful, add a new tuple to the list with the two ranges
-            tuples.Add(new Tuple<Range, Range>(first, second));
-        }
-    }
+    var first = new Tuple<int, int>(int.Parse(parts[0].Split("-")[0]),
+        int.Parse(parts[0].Split("-")[1]));
+    
+    var second = new Tuple<int, int>(int.Parse(parts[1].Split("-")[0]),
+        int.Parse(parts[1].Split("-")[1]));
+
+    tuples.Add(new (first, second));
 }
 
 // Counter for pairs in which one range fully contains the other
@@ -31,11 +23,11 @@ var counter = 0;
 foreach (var tuple in tuples)
 {
     // Check if one range completely contains the other
-    if (tuple.Item1.Start <= tuple.Item2.Start && tuple.Item2.End <= tuple.Item1.End)
+    if (tuple.Item1.Item1 <= tuple.Item2.Item1 && tuple.Item2.Item2 <= tuple.Item1.Item2)
     {
         counter++;
     }
-    else if (tuple.Item2.Start <= tuple.Item1.Start && tuple.Item1.End <= tuple.Item2.End)
+    else if (tuple.Item2.Item1 <= tuple.Item1.Item1 && tuple.Item1.Item2 <= tuple.Item2.Item2)
     {
         counter++;
     }
@@ -43,7 +35,7 @@ foreach (var tuple in tuples)
 
 // Part 2
 // Counter for pairs that overlap at all
-var counter2 = tuples.Count(tuple => tuple.Item1.Start <= tuple.Item2.End && tuple.Item2.Start <= tuple.Item1.End);
+var counter2 = tuples.Count(tuple => tuple.Item1.Item1 <= tuple.Item2.Item2 && tuple.Item2.Item1 <= tuple.Item1.Item2);
 
 // Print the result
 Console.WriteLine(counter);

@@ -73,6 +73,7 @@ int GetScenicScore(int row, int col, int value)
     {
         var nextValue = valuesToTheLeft.Pop();
         leftSideScore++;
+        
         if (nextValue >= value)
         {
             break;

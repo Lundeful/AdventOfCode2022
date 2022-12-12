@@ -2,9 +2,8 @@
 // input = File.ReadLines("testinput.txt").ToList();
 
 var grid = new Node[input.Count, input[0].Length];
-Node startNode = new Node();
-Node endNode = new Node();
-var possibleStartingNodes = new List<Node>();
+var startNode = new Node();
+var endNode = new Node();
 
 ParseInput();
 var result = BFS();
@@ -82,11 +81,8 @@ int BFS()
             if (adjacentNode.Visited) continue;
 
             adjacentNode.Visited = true;
-            // if (adjacentNode.Distance >= node.Distance + 1 || adjacentNode.Distance == -1)
-            // {
-                adjacentNode.Distance = node.Distance + 1;
-                nodes.Enqueue(adjacentNode);
-            // }
+            adjacentNode.Distance = node.Distance + 1;
+            nodes.Enqueue(adjacentNode);
         }
     }
     
@@ -129,7 +125,6 @@ List<Node> GetValidNodes(Node node)
 
     if (canGoLeft)
         availableNodes.Add(grid[row, col - 1]);
-    
 
     if (canGoRight)
         availableNodes.Add(grid[row, col + 1]);

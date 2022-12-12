@@ -1,23 +1,21 @@
 ﻿var input = File.ReadLines("input.txt").ToList();
-// input = File.ReadLines("testinput.txt").ToList();
+// input = File.ReadLines("testinput.txt").ToList(); // Test input, should be 31 for Part 1, 29 for Part 2
 
 var grid = new Node[input.Count, input[0].Length];
 var startNode = new Node();
 var endNode = new Node();
 
 ParseInput();
-var result = BFS();
-Console.WriteLine("Amount of steps: " + (result));
+var result = FindShortestPath(startNode);
+Console.WriteLine("Amount of steps from S: " + (result));
 
 foreach (var node in grid)
 {
     if (node.Value == 1)
     {
-        ParseInput();
-        startNode.Distance = -1;
+        ResetGrid();
         node.Distance = 0;
-        startNode = node;
-        var newRes = BFS();
+        var newRes = FindShortestPath(node);
         result = newRes > 0 ? Math.Min(newRes, result) : result;
     }
 }
@@ -61,10 +59,11 @@ void ParseInput()
     }
 }
 
-int BFS()
+// Breadth First Search
+int FindShortestPath(Node firstNode)
 {
     var nodes = new Queue<Node>();
-    nodes.Enqueue(startNode);
+    nodes.Enqueue(firstNode);
     while (nodes.Any())
     {
         // PrintGrid();
@@ -72,20 +71,18 @@ int BFS()
         node.Visited = true;
         if (node == endNode)
         {
-            Console.WriteLine("FOOUND IT: " + node.Distance);
+            // Console.WriteLine("FOOUND IT: " + node.Distance);
             return node.Distance;
         }
         var adjacentNodes = GetValidNodes(node);
-        foreach (var adjacentNode in adjacentNodes)
+        foreach (var adjacentNode in adjacentNodes.Where(adjacentNode => !adjacentNode.Visited))
         {
-            if (adjacentNode.Visited) continue;
-
             adjacentNode.Visited = true;
             adjacentNode.Distance = node.Distance + 1;
             nodes.Enqueue(adjacentNode);
         }
     }
-    
+
     return endNode.Distance;
 }
 
@@ -105,7 +102,16 @@ void PrintGrid()
     Console.WriteLine(content);
 }
 
-List<Node> GetValidNodes(Node node)
+void ResetGrid()
+{
+    foreach (var node in grid)
+    {
+        node.Visited = false;
+        node.Distance = -1;
+    }
+}
+
+IEnumerable<Node> GetValidNodes(Node node)
 {
     var row = node.Row;
     var col = node.Col;

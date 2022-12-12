@@ -1,6 +1,8 @@
 # AdventOfCode
 AOC 2022
 
+My solutions while participating in Advent Of Code 2022. The logic is the same as when I solved them, but sometimes I do cleaup/refactoring after I have passed the challenge.
+
 - [x] Day 1 Part 1
 - [x] Day 1 Part 2
 - [X] Day 2 Part 1
@@ -17,14 +19,14 @@ AOC 2022
 - [X] Day 7 Part 2
 - [X] Day 8 Part 1
 - [X] Day 8 Part 2
-- [ ] Day 9 Part 1
-- [ ] Day 9 Part 2
-- [ ] Day 10 Part 1
-- [ ] Day 10 Part 2
-- [ ] Day 11 Part 1
-- [ ] Day 11 Part 2
-- [ ] Day 12 Part 1
-- [ ] Day 12 Part 2
+- [X] Day 9 Part 1
+- [X] Day 9 Part 2
+- [X] Day 10 Part 1
+- [X] Day 10 Part 2
+- [X] Day 11 Part 1
+- [X] Day 11 Part 2
+- [X] Day 12 Part 1
+- [X] Day 12 Part 2
 - [ ] Day 13 Part 1
 - [ ] Day 13 Part 2
 - [ ] Day 14 Part 1

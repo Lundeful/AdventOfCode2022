@@ -4,12 +4,26 @@
 var grid = new Node[input.Count, input[0].Length];
 Node startNode = new Node();
 Node endNode = new Node();
+var possibleStartingNodes = new List<Node>();
 
 ParseInput();
 var result = BFS();
 Console.WriteLine("Amount of steps: " + (result));
-PrintGrid();
 
+foreach (var node in grid)
+{
+    if (node.Value == 1)
+    {
+        ParseInput();
+        startNode.Distance = -1;
+        node.Distance = 0;
+        startNode = node;
+        var newRes = BFS();
+        result = newRes > 0 ? Math.Min(newRes, result) : result;
+    }
+}
+
+Console.WriteLine("Shortest starting point: " + result);
 
 void ParseInput()
 {
@@ -33,19 +47,16 @@ void ParseInput()
             {
                 letter = 'a';
                 startNode = node;
-                node.Value = 1;
-                Console.WriteLine("Start found: " + node.Value);
+                node.Value = letter.ToString().ToLower()[0] - 96;
                 node.Distance = 0;
             }
             else if (letter == 'E')
             {
                 letter = 'z';
-                node.Value = 27;
-                Console.WriteLine("Goal found: " + node.Value);
+                node.Value = letter.ToString().ToLower()[0] - 96;
                 endNode = node;
                 node.Distance = -1;
             }
-
             grid[rowIndex, colIndex] = node;
         }
     }
@@ -63,6 +74,7 @@ int BFS()
         if (node == endNode)
         {
             Console.WriteLine("FOOUND IT: " + node.Distance);
+            return node.Distance;
         }
         var adjacentNodes = GetValidNodes(node);
         foreach (var adjacentNode in adjacentNodes)
@@ -70,11 +82,11 @@ int BFS()
             if (adjacentNode.Visited) continue;
 
             adjacentNode.Visited = true;
-            if (adjacentNode.Distance >= node.Distance + 1 || adjacentNode.Distance == -1)
-            {
+            // if (adjacentNode.Distance >= node.Distance + 1 || adjacentNode.Distance == -1)
+            // {
                 adjacentNode.Distance = node.Distance + 1;
                 nodes.Enqueue(adjacentNode);
-            }
+            // }
         }
     }
     
@@ -94,7 +106,7 @@ void PrintGrid()
         }
         content += "\n";
     }
-    // Console.WriteLine(content);
+    Console.WriteLine(content);
 }
 
 List<Node> GetValidNodes(Node node)
@@ -108,12 +120,7 @@ List<Node> GetValidNodes(Node node)
     var canGoRight = col + 1 < grid.GetLength(1) && grid[row, col + 1].Value <= node.Value + 1;
 
     var availableNodes = new List<Node>();
-
-    if (row == 3 && col == 5)
-    {
-        Console.WriteLine("Synder funnet");
-    } 
-
+    
     if (canGoUp)
         availableNodes.Add(grid[row - 1, col]);
 

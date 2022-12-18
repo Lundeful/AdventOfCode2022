@@ -4,10 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && node ./dist/index.js",
-    "start-watch": "ts-node-dev index.ts",
-    "watch": "nodemon index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "nodemon index.ts"
   },
   "keywords": [],
   "author": "",

@@ -1,10 +1,10 @@
 {
-  "name": "AOC",
+  "name": "D17TS",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "watch": "nodemon index.ts"
+    "watch": "nodemon index.ts",
   },
   "keywords": [],
   "author": "",

@@ -1,9 +1,8 @@
 export interface Shape {
     name: string;
-    lines: Coordinate[];
-    currentStartingCoordinate?: { x: number; y: number };
-    width: number;
-    height: number;
+    lines: (pos: Coordinate) => Coordinate[];
+    pos: Coordinate;
+    isActive: boolean;
 }
 
 export interface Coordinate {
@@ -13,64 +12,74 @@ export interface Coordinate {
 
 export const FlatLine: Shape = {
     name: 'FlatLine',
-    lines: [
-        { x: 0, y: 0 },
-        { x: 1, y: 0 },
-        { x: 2, y: 0 },
-        { x: 3, y: 0 },
-    ],
-    width: 4,
-    height: 1,
+    lines: ({ x, y }: Coordinate) => {
+        return [
+            { x: x + 0, y: y + 0 },
+            { x: x + 1, y: y + 0 },
+            { x: x + 2, y: y + 0 },
+            { x: x + 3, y: y + 0 },
+        ];
+    },
+    pos: { x: -1, y: 1 },
+    isActive: false,
 };
 
 export const Plus: Shape = {
     name: 'Plus',
-    lines: [
-        { x: 1, y: 0 },
-        { x: 0, y: 1 },
-        { x: 1, y: 1 },
-        { x: 2, y: 1 },
-        { x: 1, y: 2 },
-    ],
-    width: 3,
-    height: 3,
+    lines: ({ x, y }: Coordinate) => {
+        return [
+            { x: x + 1, y: y + 0 },
+            { x: x + 0, y: y + 1 },
+            { x: x + 1, y: y + 1 },
+            { x: x + 2, y: y + 1 },
+            { x: x + 1, y: y + 2 },
+        ];
+    },
+    pos: { x: -10, y: -10 },
+    isActive: false,
 };
 
 export const L: Shape = {
     name: 'L',
-    lines: [
-        { x: 2, y: 0 },
-        { x: 2, y: 1 },
-        { x: 2, y: 2 },
-        { x: 1, y: 2 },
-        { x: 0, y: 2 },
-    ],
-    width: 3,
-    height: 3,
+    lines: ({ x, y }: Coordinate) => {
+        return [
+            { x: x + 2, y: y + 0 },
+            { x: x + 2, y: y + 1 },
+            { x: x + 2, y: y + 2 },
+            { x: x + 1, y: y },
+            { x: x + 0, y: y },
+        ];
+    },
+    pos: { x: -1, y: 1 },
+    isActive: false,
 };
 
 export const Square: Shape = {
     name: 'Square',
-    lines: [
-        { x: 0, y: 0 },
-        { x: 1, y: 0 },
-        { x: 0, y: 1 },
-        { x: 1, y: 1 },
-    ],
-    width: 2,
-    height: 2,
+    lines: ({ x, y }: Coordinate) => {
+        return [
+            { x: x + 0, y: y + 0 },
+            { x: x + 1, y: y + 0 },
+            { x: x + 0, y: y + 1 },
+            { x: x + 1, y: y + 1 },
+        ];
+    },
+    pos: { x: -1, y: 1 },
+    isActive: false,
 };
 
 export const StandingLine: Shape = {
     name: 'StandingLine',
-    lines: [
-        { x: 0, y: 0 },
-        { x: 0, y: 1 },
-        { x: 0, y: 2 },
-        { x: 0, y: 3 },
-    ],
-    width: 1,
-    height: 4,
+    lines: ({ x, y }: Coordinate) => {
+        return [
+            { x: x + 0, y: y + 0 },
+            { x: x + 0, y: y + 1 },
+            { x: x + 0, y: y + 2 },
+            { x: x + 0, y: y + 3 },
+        ];
+    },
+    pos: { x: -1, y: 1 },
+    isActive: false,
 };
 
-export const Shapes = [FlatLine, Plus, L, StandingLine];
+export const Shapes = [FlatLine, Plus, L, StandingLine, Square];

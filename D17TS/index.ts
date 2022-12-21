@@ -1,155 +1,150 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { Coordinate, Shape, Shapes } from './shapes';
 
 console.clear();
 console.log('\n#################### Running program ####################');
-const moves = fs.readFileSync('./testInput.txt').toString().split('');
-const spawnCoordinate: Coordinate = { x: 3, y: 0 };
+const moves = fs.readFileSync('./input.txt').toString().split('');
 const shapes = Shapes;
-const board: string[][] = [[]];
-
-const FillStartingBoard = () => {
-    for (let row = 0; row < 300; row++) {
-        board[row] = [];
-        for (let col = 0; col < 7; col++) {
-            const el = '.';
-            board[row][col] = el;
-        }
-    }
-};
-
-const cycleShapes = (): void => {
-    shapes.push(shapes.shift()!);
-};
+const pieces: Shape[] = [];
+let inactivePieces = 0;
 
 const PlacePiece = () => {
-    const nextShape = shapes[0];
-    const pos = nextPieceStartingPos(board);
-    if (nextShape.height > 1) pos.y += nextShape.height - 1;
+    const newShape = shapes.shift()!;
+    shapes.push({ ...newShape });
+    newShape.isActive = true;
+    newShape.pos = getNextPieceStartingPos();
+    pieces.unshift(newShape);
+};
 
-    nextShape.lines.forEach(line => {
-        const x = line.x + pos.x;
-        const y = line.y + pos.y;
-        board[y][x] = '@';
+const getNextPieceStartingPos = () => {
+    const xOffset = 2;
+    const yOffset = 4;
+
+    if (pieces.length == 0) {
+        // Initial piece
+        return { x: xOffset, y: 3 };
+    }
+
+    const positions = pieces.flatMap(p => p.lines(p.pos).map(p => p.y));
+    const maxY = Math.max.apply(Math, positions);
+
+    const yPos = maxY + yOffset;
+    const newPos: Coordinate = { x: xOffset, y: yPos };
+    return newPos;
+};
+
+const delay = async (ms: number = 100) => {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
     });
-    cycleShapes();
 };
 
-const nextPieceStartingPos = (board: string[][]): Coordinate => {
-    let brickCoordinate: Coordinate | null = null;
-    for (let row = board.length - 1; row >= 0 && brickCoordinate != null; row--) {
-        for (let col = 0; col < 7 && brickCoordinate != null; col++) {
-            const element = board[row][col];
-            if (element === '#') {
-                brickCoordinate = { x: col, y: row };
-            }
-        }
-    }
-
-    if (brickCoordinate == null || board.length <= 3) {
-        // Empty board
-        return { x: 2, y: 3 };
-    }
-
-    const nextPos = { x: 2, y: brickCoordinate.y + 3 };
-
-    return nextPos!;
+const pieceIsOverlapping = (piece: Shape, pos: Coordinate) => {
+    return piece.lines(piece.pos).some(l => l.x == pos.x && l.y == pos.y);
 };
 
-const movePieceSideways = (direction: string) => {
-    if (direction == '>') {
-        const canMoveRight = checkIfCanMoveRight();
-        if (canMoveRight) {
-            // Move right
-        }
-    } else if (direction == '<') {
-        const canMoveLeft = checkIfCanMoveLeft();
-        if (canMoveLeft) {
-            // Move left
-        }
-    }
-};
-
-const movePieceDown = () => {
-    const coordinates = [];
-    for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[i].length; j++) {
-            if (board[i][j] === '@') {
-                coordinates.push({ x: i, y: j });
-            }
-        }
+const printBoard = async (ms?: number) => {
+    console.clear();
+    if (pieces.length == 0) {
+        console.log('Empty board');
+        return;
     }
 
-    if (coordinates.some(c => c.y - 1 == 0)) {
-        // Reaches bottom
-        board.forEach(l => l.forEach(c => c.replace('@', '#')));
-        let didHit = false;
-        coordinates.forEach(c => {
-            if (!didHit) {
-                const existingEl = board[c.y - 1][c.x];
-                if (existingEl == '#') {
-                    didHit = true;
-                }
-            }
-        });
-    } else {
-        // Move down
-    }
-};
+    const positions = pieces.flatMap(p => p.lines(p.pos).map(p => p.y));
+    const maxY = Math.max.apply(Math, positions);
 
-const printBoard = (move: string) => {
-    console.log('\n\n### Current board ###');
     let content = '';
-    for (let i = board.length - 1; i >= 0; i--) {
-        const line = board[i];
-        for (let j = 0; j < line.length; j++) {
-            const element = line[j];
-            content += ` ${element} `;
+    for (let y = 0; y < maxY + 1; y++) {
+        for (let x = 0; x < 7; x++) {
+            const activePiece = pieces.some(p => pieceIsOverlapping(p, { x, y }) && p.isActive);
+            const inactivePiece = pieces.some(p => pieceIsOverlapping(p, { x, y }) && !p.isActive);
+
+            if (activePiece) {
+                content += '\x1b[41m  \x1b[0m';
+            } else if (inactivePiece) {
+                content += '\x1b[44m  \x1b[0m';
+            } else {
+                content += '\x1b[40m[]\x1b[0m';
+            }
         }
         content += '\n';
     }
 
-    content += 'Moved ' + move;
-
-    console.log(content);
+    const bottomBar = '\x1b[40m##############\x1b[0m\n';
+    console.log(bottomBar + content);
+    await delay(ms);
 };
 
-FillStartingBoard();
-printBoard('nowhere');
+const canMove = (to: Coordinate): boolean => {
+    const newPieces = [...pieces];
+    const pieceToMove = newPieces.shift()!;
+    const wantedPieceCoordinates = pieceToMove.lines(to);
 
-const PlayRound = () => {
-    if (!board.some(row => row.some(col => col == '@'))) {
-        // No active pieces
+    if (wantedPieceCoordinates.some(c => c.x > 6 || c.x < 0 || c.y < 0)) return false;
+
+    const takenCoordinates = newPieces.flatMap(p => p.lines(p.pos));
+    const isTaken = wantedPieceCoordinates.some(c1 => takenCoordinates.some(c2 => c1.x == c2.x && c1.y == c2.y));
+    return !isTaken;
+};
+
+const moveSideways = (move: string) => {
+    const dir = move == '<' ? -1 : 1;
+    const activePiece = pieces[0];
+    const wantedPosition: Coordinate = { x: activePiece.pos.x + dir, y: activePiece.pos.y };
+    if (canMove(wantedPosition)) {
+        activePiece.pos = wantedPosition;
+    }
+};
+
+const moveDown = () => {
+    const activePiece = pieces[0];
+    const wantedPosition: Coordinate = { x: activePiece.pos.x, y: activePiece.pos.y - 1 };
+    if (canMove(wantedPosition)) {
+        activePiece.pos = wantedPosition;
+    } else {
+        activePiece.isActive = false;
+        inactivePieces++;
+    }
+};
+
+const PlayRound = async (move?: string) => {
+    if (pieces.length == 0 || pieces.every(p => !p.isActive)) {
         PlacePiece();
+        await printBoard(10);
+        // console.log("yolo");
     }
-    const move = moves.shift();
+
     if (move) {
-        movePieceSideways(move);
+        moveSideways(move);
+        await printBoard(3);
     }
-    movePieceDown();
-    printBoard(move!);
+
+    moveDown();
+    await printBoard(3);
 };
 
 const PlayGame = async () => {
-    while (moves.length > 0) {
-        PlayRound();
-        const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-        await delay(1000);
+    console.log('Starting game');
+    const part1 = 2022; // 3159
+    const part2 = 1000000000000; // No chance lol
+
+    var startTime = performance.now();
+    while (inactivePieces < part1) {
+        const nextMove = moves.shift()!;
+        moves.push(nextMove);
+        await PlayRound(nextMove);
     }
+
+    await printBoard();
+    printSummary();
+};
+
+const printSummary = () => {
+    console.log('Amount of pieces', pieces.length);
+
+    const allYCoordinates = pieces.flatMap(p => p.lines(p.pos).map(p => p.y));
+    const maxY = Math.max.apply(Math, allYCoordinates);
+    console.log('Units tall', maxY + 1);
 };
 
 PlayGame();
-
-function checkIfCanMoveRight() {
-    return true;
-}
-
-function checkIfCanMoveLeft() {
-    // TODO:
-    return true;
-}
-
-function checkIfCanMoveDown(coordinates: Coordinate[]) {
-    
-
-}

@@ -16,6 +16,7 @@ interface Elf {
     id: number;
     currentPos: Coordinate;
     nextPos: Coordinate;
+    previousPos: Coordinate;
 }
 
 const getElves = (lines: string[]): Elf[] => {
@@ -23,13 +24,14 @@ const getElves = (lines: string[]): Elf[] => {
     let id = 1;
     for (let row = 0; row < lines.length; row++) {
         for (let col = 0; col < lines[row].length; col++) {
-            const el = lines[col][row];
+            const el = lines[row][col];
             if (el === '#') {
                 const pos: Coordinate = { x: col, y: row };
                 const elf: Elf = {
                     id: id++,
                     currentPos: pos,
                     nextPos: pos,
+                    previousPos: pos,
                 };
                 elves.push(elf);
             }
@@ -135,7 +137,10 @@ const printGrid = (elves: Elf[]) => {
 };
 
 const getEmptyGroundTiles = (elves: Elf[]) => {
-    for (let round = 1; round <= rounds; round++) {
+    let movedLastRound = true;
+    let roundCount = 0;
+    while (roundCount < 10 || elves.some(e => !pointsOverlap(e.currentPos, e.previousPos))) {
+        movedLastRound = false;
         // Calculate next move
         elves.forEach(elf => {
             elf.nextPos = getNextPosition(elves, elf);
@@ -145,12 +150,16 @@ const getEmptyGroundTiles = (elves: Elf[]) => {
         elves.forEach(elf => {
             const movesAreOverlapping = elves.some(e => e.id !== elf.id && pointsOverlap(e.nextPos, elf.nextPos));
             if (!movesAreOverlapping) {
+                elf.previousPos = elf.currentPos;
                 elf.currentPos = elf.nextPos;
             }
         });
 
         // Change directions for next round
         directions.push(directions.shift()!);
+
+        roundCount++;
+        console.log('Round completed', roundCount);
     }
 
     const minY = Math.min.apply(
@@ -184,6 +193,8 @@ const getEmptyGroundTiles = (elves: Elf[]) => {
     console.log('Width', width, 'Height', height);
     console.log('Tiles', numberOfTiles);
     console.log('Elves', numberOfElves);
+    console.log('Round', roundCount);
+
     return emptyTiles;
 };
 
@@ -201,3 +212,6 @@ const emptyRealTiles = getEmptyGroundTiles(realElves);
 console.log('Empty real tiles', emptyRealTiles);
 // 3709 - Wrong, too low
 // 3867 - Wrong
+
+// Part 2
+// 977, 976 too high

@@ -23,7 +23,7 @@ const getElves = (lines: string[]): Elf[] => {
     let id = 1;
     for (let row = 0; row < lines.length; row++) {
         for (let col = 0; col < lines[row].length; col++) {
-            const el = lines[row][col];
+            const el = lines[col][row];
             if (el === '#') {
                 const pos: Coordinate = { x: col, y: row };
                 const elf: Elf = {
@@ -135,17 +135,17 @@ const printGrid = (elves: Elf[]) => {
 };
 
 const getEmptyGroundTiles = (elves: Elf[]) => {
-    for (let round = 0; round < rounds; round++) {
+    for (let round = 1; round <= rounds; round++) {
         // Calculate next move
         elves.forEach(elf => {
-            elf.nextPos = getNextPosition([...elves], { ...elf });
+            elf.nextPos = getNextPosition(elves, elf);
         });
 
         // Execute next move
         elves.forEach(elf => {
             const movesAreOverlapping = elves.some(e => e.id !== elf.id && pointsOverlap(e.nextPos, elf.nextPos));
             if (!movesAreOverlapping) {
-                elf.currentPos = { ...elf.nextPos };
+                elf.currentPos = elf.nextPos;
             }
         });
 

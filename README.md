@@ -43,11 +43,11 @@ My solutions while participating in Advent Of Code 2022. The logic is the same a
 - [ ] Day 19 Part 2
 - [X] Day 20 Part 1
 - [X] Day 20 Part 2
-- [ ] Day 21 Part 1
+- [X] Day 21 Part 1
 - [ ] Day 21 Part 2
 - [ ] Day 22 Part 1
 - [ ] Day 22 Part 2
-- [ ] Day 23 Part 1
-- [ ] Day 23 Part 2
+- [X] Day 23 Part 1
+- [X] Day 23 Part 2
 - [ ] Day 24 Part 1
 - [ ] Day 24 Part 2

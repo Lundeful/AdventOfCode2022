@@ -35,7 +35,7 @@ My solutions while participating in Advent Of Code 2022. The logic is the same a
 - [ ] Day 15 Part 2
 - [ ] Day 16 Part 1
 - [ ] Day 16 Part 2
-- [ ] Day 17 Part 1
+- [X] Day 17 Part 1
 - [ ] Day 17 Part 2
 - [X] Day 18 Part 1
 - [X] Day 18 Part 2
